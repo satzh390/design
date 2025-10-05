@@ -22,6 +22,9 @@ My goals with this repo:
 - Clean abstractions to swap between strategies.  
 - Future extension: distributed rate limiting (e.g. Redis-based).  
 
+### [Filter](./Filter)
+The `Filter` module provides a **Bloom Filter implementation** optimized for memory efficiency and fast lookups.  
+
 ---
 
 ## 📅 Upcoming Topics
