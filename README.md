@@ -23,7 +23,7 @@ My goals with this repo:
 - Future extension: distributed rate limiting (e.g. Redis-based).  
 
 ### [Filter](./Filter)
-The `Filter` module provides a **Bloom Filter implementation** optimized for memory efficiency and fast lookups.  
+ - The `Filter` module provides a **Bloom Filter implementation** optimized for memory efficiency and fast lookups.  
 
 ---
 
