@@ -20,7 +20,7 @@ My goals with this repo:
 | **Filter** | [Filter](./Filter) | Filtering patterns and implementations for data streams and requests. |
 | **Consensus Algorithms** | [Consensus](./Consensus) | Quorum-based and other consensus techniques for distributed systems. |
 | **Failure Detection Algorithms** | [FailureDetection](./FailureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
-| **Conflict Resolution Algorithms** | [ConflictResolution](./ConflictResolution) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
+| **Replica consistency Algorithms** | [ReplicaConsistency](./ReplicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
 
 ---
 
@@ -54,13 +54,3 @@ I will be contributing designs and implementations for the following areas:
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
 
 ----
-
-## 🧑‍💻 About Me
-I’m **Sathish Soundararajan**, a Senior Software Engineer with 7+ years of backend & distributed system experience (Java, Spring Boot, Go, Kafka, AWS).  
-I love solving design challenges, writing clean code, and sharing architectural insights.  
-
-Connect with me:  
-- [LinkedIn](https://www.linkedin.com/in/sathish-soundararajan-85a877227)  
-- [LeetCode](https://leetcode.com/u/leetsatzh) | [CSES](https://cses.fi/user/259187)  
-
----
