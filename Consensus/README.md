@@ -75,7 +75,7 @@ Here, even if one replica is slow, write operations can succeed quickly, and rea
 ### References
 
 - [Quorum Consensus – Wikipedia](https://en.wikipedia.org/wiki/Quorum-based_replication)
-- [Cassandra Consistency Levels](https://cassandra.apache.org/doc/latest/cassandra/dml/consistency.html)
+- [Cassandra Consistency Levels](https://cassandra.apache.org/doc/stable/cassandra/architecture/dynamo.html#tunable-consistency)
 
 ---
 
