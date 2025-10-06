@@ -97,13 +97,6 @@ Raft is an alternative to Paxos that is **simpler to understand and implement**.
 - Ensures consistency through **majority agreement**
 - Reference: [The Raft Consensus Algorithm](https://raft.github.io/)
 
-### Gossip Protocol
-
-Gossip protocols are used for **eventual consistency** in large distributed systems. Nodes **periodically exchange state information** with random peers.
-
-- Example usage: membership, failure detection
-- Reference: [Gossip Protocols – ACM](https://dl.acm.org/doi/10.1145/145727.145745)
-
 ---
 
 
