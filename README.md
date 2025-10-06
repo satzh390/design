@@ -45,6 +45,16 @@ I will be contributing designs and implementations for the following areas:
 
 ---
 
+## References
+- [Grokking System design](https://drive.google.com/file/d/1lXflm5NSP9MR4XX2YKSnaOMJpPXzN5CO/view?usp=sharing)
+- [ByteByteGo Repo](https://github.com/ByteByteGoHq/system-design-101)
+- [ByteByteGo course paid](https://bytebytego.com/courses/system-design-interview)
+- [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/B08X8ZXT15)
+- [Design Pattern](https://refactoring.guru/design-patterns)
+- [System Design Primer](https://github.com/donnemartin/system-design-primer)
+
+----
+
 ## 🧑‍💻 About Me
 I’m **Sathish Soundararajan**, a Senior Software Engineer with 7+ years of backend & distributed system experience (Java, Spring Boot, Go, Kafka, AWS).  
 I love solving design challenges, writing clean code, and sharing architectural insights.  
