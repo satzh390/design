@@ -11,19 +11,16 @@ My goals with this repo:
 
 ---
 
-## 📂 Current Topics
+## Current Topics
 
-### [Hashing](./Hashing)
-- Implementation of **Consistent Hashing** with virtual nodes, server add/remove, and key redistribution.  
-- Future extension: **Rendezvous Hashing (HRW)** and replication logic for fault tolerance.  
-
-### [RateLimiter](./RateLimiter)
-- Implementations of different **rate limiting algorithms** (Token Bucket, Leaky Bucket, Sliding Window, Fixed Window).  
-- Clean abstractions to swap between strategies.  
-- Future extension: distributed rate limiting (e.g. Redis-based).  
-
-### [Filter](./Filter)
- - The `Filter` module provides a **Bloom Filter implementation** optimized for memory efficiency and fast lookups.  
+| Topic | Subfolders | Description |
+|-------|------------|------------|
+| **Hashing** | [Hashing](./Hashing) | Data distribution and hash-based structures. |
+| **Rate Limiter** | [RateLimiter](./RateLimiter) | Implementation of rate limiting algorithms. |
+| **Filter** | [Filter](./Filter) | Filtering patterns and implementations for data streams and requests. |
+| **Consensus Algorithms** | [Consensus](./Consensus) | Quorum-based and other consensus techniques for distributed systems. |
+| **Failure Detection Algorithms** | [FailureDetection](./FailureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
+| **Conflict Resolution Algorithms** | [ConflictResolution](./ConflictResolution) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
 
 ---
 
