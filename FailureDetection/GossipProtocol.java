@@ -187,7 +187,7 @@ public class GossipProtocol {
             nodeList.add(node);
         }
 
-        // 🔧 Initialize each node’s membership table (everyone knows everyone)
+        // Initialize each node’s membership table (everyone knows everyone)
         long now = System.currentTimeMillis();
         for (Node node : nodeList) {
             for (int i = 0; i < nodeCount; i++) {
