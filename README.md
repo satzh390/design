@@ -21,6 +21,7 @@ My goals with this repo:
 | **Consensus Algorithms** | [Consensus](./Consensus) | Quorum-based and other consensus techniques for distributed systems. |
 | **Failure Detection Algorithms** | [FailureDetection](./FailureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
 | **Replica consistency Algorithms** | [ReplicaConsistency](./ReplicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
+| **ID Generator** | [IdGenerator](./IdGenerator) | Implementation of unique, time-ordered ID generation algorithms including Twitter Snowflake–style generator for distributed systems. |
 
 ---
 
