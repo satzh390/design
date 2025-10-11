@@ -54,3 +54,9 @@ I will be contributing designs and implementations for the following areas:
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
 
 ----
+## 🧑‍💻 About Me 
+
+I’m **Sathish Soundararajan**, a Senior Software Engineer with 7+ years of backend & distributed system experience (Java, Spring Boot, Go, Kafka, AWS). I love solving design challenges, writing clean code, and sharing architectural insights. 
+Connect with me: 
+- [LinkedIn](https://www.linkedin.com/in/sathish-soundararajan-85a877227)
+- [LeetCode](https://leetcode.com/u/leetsatzh) | [CSES](https://cses.fi/user/259187)
