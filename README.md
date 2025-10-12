@@ -7,7 +7,7 @@ My goals with this repo:
 - Showcase **clean code practices** (SOLID, design patterns, modular abstractions)  
 - Explore **low-level design** (LLD) and **system design** topics in depth  
 - Document trade-offs, edge cases, and performance considerations  
-- Build a reference base that I (and others) can reuse for interviews, projects, and learning  
+- Build a reference base that I (and others) can reuse for projects, and learning  
 
 ---
 
