@@ -67,3 +67,5 @@ Connect with me:
 - [SSTable](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/)
 - [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)
 - [Amazon: Dynamo highly available key value store](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)
+- [Ticket Servers: Distributed Unique Primary Keys on the Cheap](https://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap/)
+- [NTP - Network time protocol](https://en.wikipedia.org/wiki/Network_Time_Protocol)
