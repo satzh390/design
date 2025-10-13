@@ -206,7 +206,7 @@ public class VectorClock {
             LinkedList<Data> resolvedList = new LinkedList<>();
             resolvedList.add(resolved);
             s3.store.put(20, resolvedList);
-            System.out.println("✅ Conflict resolved at S3: merged as 'B3'");
+            System.out.println("Conflict resolved at S3: merged as 'B3'");
         }
 
         s3.add(20, "B4"); // S3 updates after resolution
