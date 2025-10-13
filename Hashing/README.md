@@ -10,14 +10,6 @@ This folder collects my designs and implementations around **hashing**, especial
 | (Optional) Rendezvous hashing code | Placeholder or future implementation to compare with consistent hashing. |
 | Test / demo classes | Sample `main(...)` usage showing how virtual nodes, data movement, and ring state evolve. |
 
-## 🎯 Design Goals & Principles
-
-- **Clarity & correctness** over over-optimization.  
-- Use **virtual nodes** to smooth out uneven distribution.  
-- Ensure **minimal key movements** when adding/removing servers.  
-- Modular design: separate hashing, ring traversal, value migration.  
-- Clean code practices: meaningful names, single responsibility, good documentation.
-
 ## 🧠 How It Works: Consistent Hashing Overview
 
 1. **Virtual Nodes**  
@@ -44,28 +36,9 @@ This folder collects my designs and implementations around **hashing**, especial
 3. Remove keys or servers as needed.  
 4. Observe storage distribution and migrations via the demo `main()`.
 
-## 🧪 Sample Usage (in Java)
+## Other concepts
 
-```java
-public static void main(String[] args) throws Exception {
-    // 3 virtual nodes per server
-    ConsistentHasher hasher = new ConsistentHasher(3);
+1. **Coordinator node**
+   Reference to Cassandra: This refers to the node that a client connects to — it can be any node within the cluster. If the connected (coordinator) node is responsible for the key, it writes the data locally and forwards it to the other replicas. Based on the configured consistency level, the coordinator sends a response to the client once the required number of acknowledgments have been received.
 
-    hasher.addServer("ServerA", 1);
-    hasher.addServer("ServerB", 2);
-    hasher.addServer("ServerC", 3);
 
-    hasher.add("apple", "red");
-    hasher.add("banana", "yellow");
-    hasher.add("cherry", "red");
-
-    hasher.printValues();
-
-    hasher.addServer("ServerD", 4);
-    System.out.println("After adding ServerD:");
-    hasher.printValues();
-
-    hasher.removeServer(2, true);
-    System.out.println("After removing ServerB:");
-    hasher.printValues();
-}
