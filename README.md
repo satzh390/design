@@ -61,3 +61,9 @@ I’m **Sathish Soundararajan**, a Senior Software Engineer with 7+ years of bac
 Connect with me: 
 - [LinkedIn](https://www.linkedin.com/in/sathish-soundararajan-85a877227)
 - [LeetCode](https://leetcode.com/u/leetsatzh) | [CSES](https://cses.fi/user/259187)
+
+----
+## Other References
+- [SSTable](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/)
+- [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)
+- [Amazon: Dynamo highly available key value store](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)
