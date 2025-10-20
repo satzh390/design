@@ -14,7 +14,7 @@ public class UrlShortnerIdRandomGenerator {
         if(idLength > 4){
             // as CRC32 generate hash of length 8, if we allow for len 8
             // long maxNoOfElements = 8_218_340_105_584_896L; // a-z A-Z 0-9 62 pow 8 21,83,40,10,55,84,896
-            // but above is too large for this demo, so to keep it simple with idLength 5
+            // but above is too large for this demo, so to keep it simple with idLength 4
             throw new IllegalArgumentException("Id length should be less than or equal to 4");
         }
 
