@@ -1,26 +1,30 @@
+package FilterAlgo;
 import java.nio.charset.StandardCharsets;
-import java.util.zip.CRC32;
-import java.util.Arrays;
 import java.util.zip.Adler32;
+import java.util.zip.CRC32;
 
 public class BloomFilter {
     private final int n;
     private double p = 0.5;
-    private final int k = 6;
+    private int k;
     private final long[] filter;
     private final int m;
     private final int bitSize = 64;
 
-    public BloomFilter(int expectedMaxElements, double expectedFalsePositiveProbability){
+    public BloomFilter(int expectedMaxElements, double expectedFalsePositiveProbability, int k){
         n = expectedMaxElements;
         p = expectedFalsePositiveProbability;
         m = calculateM(n, k, p);
         filter = new long[(m + bitSize - 1) / bitSize]; // to reduce memory size(use bit instead of byte)
+        this.k = k;
+    }
+
+    public BloomFilter(int expectedMaxElements, double expectedFalsePositiveProbability){
+       this(expectedMaxElements, expectedFalsePositiveProbability, 6);
     }
 
     public void add(String key){
         int[] bitPositions = getFilterPos(key);
-        int bitMask = 0;
         for(int i = 0; i < bitPositions.length; i++){
             int pos = bitPositions[i];
             int segmentPos = pos / bitSize;
