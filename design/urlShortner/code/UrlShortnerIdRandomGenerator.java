@@ -38,7 +38,6 @@ public class UrlShortnerIdRandomGenerator {
             longUrl += collisionAppendKey;
             curHash = hash(longUrl);
             count += 1;
-            System.out.println(curHash);
         }
 
         if(count == expectedNoOfElements){
