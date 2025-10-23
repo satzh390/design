@@ -1,4 +1,4 @@
-package RateLimiter;
+package rateLimiter;
 
 public class FixedWindowRateLimiter {
     private final int maxRequests;

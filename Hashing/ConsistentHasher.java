@@ -1,10 +1,10 @@
-package Hashing;
+package hashing;
 
-import java.util.*;
-import java.util.Map.Entry;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class ConsistentHasher {
     public static class Server {

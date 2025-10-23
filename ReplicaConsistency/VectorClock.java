@@ -1,4 +1,4 @@
-package ReplicaConsistency;
+package replicaConsistency;
 
 import java.util.HashMap;
 import java.util.HashSet;

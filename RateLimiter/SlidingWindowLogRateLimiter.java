@@ -1,4 +1,4 @@
-package RateLimiter;
+package rateLimiter;
 
 import java.util.LinkedList;
 import java.util.Queue;

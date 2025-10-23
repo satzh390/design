@@ -1,4 +1,4 @@
-package RateLimiter;
+package rateLimiter;
 
 public class SlidingWindowCounterRateLimiter {
     private final int windowSizeInMillis;

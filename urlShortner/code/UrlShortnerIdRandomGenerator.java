@@ -1,7 +1,6 @@
-package design.urlShortner.code;
-
-import FilterAlgo.BloomFilter;
 import java.util.zip.CRC32;
+
+import filter.BloomFilter;
 
 public class UrlShortnerIdRandomGenerator {
     private final int idLength;

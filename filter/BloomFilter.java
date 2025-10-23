@@ -1,4 +1,4 @@
-package FilterAlgo;
+package filter;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;

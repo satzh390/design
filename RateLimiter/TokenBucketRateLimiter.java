@@ -1,4 +1,4 @@
-package RateLimiter;
+package rateLimiter;
 
 import java.time.Instant;
 import java.time.Duration;

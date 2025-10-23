@@ -15,13 +15,13 @@ My goals with this repo:
 
 | Topic | Subfolders | Description |
 |-------|------------|------------|
-| **Hashing** | [Hashing](./Hashing) | Data distribution and hash-based structures. |
-| **Rate Limiter** | [RateLimiter](./RateLimiter) | Implementation of rate limiting algorithms. |
-| **Filter** | [Filter](./Filter) | Filtering patterns and implementations for data streams and requests. |
-| **Consensus Algorithms** | [Consensus](./Consensus) | Quorum-based and other consensus techniques for distributed systems. |
-| **Failure Detection Algorithms** | [FailureDetection](./FailureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
-| **Replica consistency Algorithms** | [ReplicaConsistency](./ReplicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
-| **ID Generator** | [IdGenerator](./IdGenerator) | Implementation of unique, time-ordered ID generation algorithms including Twitter Snowflake–style generator for distributed systems. |
+| **Hashing** | [Hashing](./hashing) | Data distribution and hash-based structures. |
+| **Rate Limiter** | [RateLimiter](./rateLimiter) | Implementation of rate limiting algorithms. |
+| **Filter** | [Filter](./filter) | Filtering patterns and implementations for data streams and requests. |
+| **Consensus Algorithms** | [Consensus](./consensus) | Quorum-based and other consensus techniques for distributed systems. |
+| **Failure Detection Algorithms** | [FailureDetection](./failureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
+| **Replica consistency Algorithms** | [ReplicaConsistency](./replicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
+| **ID Generator** | [IdGenerator](./idGenerator) | Implementation of unique, time-ordered ID generation algorithms including Twitter Snowflake–style generator for distributed systems. |
 
 ---
 

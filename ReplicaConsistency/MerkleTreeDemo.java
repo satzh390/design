@@ -1,4 +1,4 @@
-package ReplicaConsistency;
+package replicaConsistency;
 
 import java.security.MessageDigest;
 import java.util.*;
