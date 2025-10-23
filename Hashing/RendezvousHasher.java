@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class RendezvousHasher {
-
     public static class Server {
         public String name;
         public int id;

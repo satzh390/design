@@ -33,7 +33,6 @@ public class SlidingWindowCounterRateLimiter {
         // Sum all buckets
         int total = 0;
         for (int count : buckets) total += count;
-
         return total <= maxRequests;
     }
 

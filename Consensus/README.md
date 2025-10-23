@@ -2,7 +2,7 @@
 
 This repository explores different **consensus algorithms** used in distributed systems, focusing on **data replication, synchronization, and consistency**. Data replicated across multiple nodes must be kept consistent, and consensus algorithms are key to achieving this.
 
----
+----
 
 ## Table of Contents
 

@@ -150,7 +150,6 @@ public class MerkleTreeDemo {
         serverA.addData("apple");
         serverA.addData("banana");
         serverA.addData("date");
-
         serverB.addData("apple");
         serverB.addData("cherry");
         serverB.addData("date");

@@ -95,7 +95,6 @@ public class TwitterSnowFlakeIdGenerator {
 
     public static void main(String[] args) {
         TwitterSnowFlakeIdGenerator generator = new TwitterSnowFlakeIdGenerator(1, 1);
-
         Set<Long> generatedIds = new HashSet<>();
         long previousId = -1;
 
