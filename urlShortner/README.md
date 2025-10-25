@@ -110,7 +110,7 @@ A URL shortener converts a long URL into a shorter alias for easier sharing and 
 
 | Column    | Type    | Description                     |
 |----------|---------|---------------------------------|
-| shortURLId | string  | Primary key, unique ID         |
+| shortID | string  | Primary key, unique ID         |
 | longURL  | string  | Original long URL                |
 | userID   | string  | Optional, creator of the URL     |
 | createdAt| timestamp | Timestamp of creation          |
