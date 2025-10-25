@@ -50,8 +50,6 @@ A URL shortener converts a long URL into a shorter alias for easier sharing and 
 
 ## High-Level Architecture
 
-![URL Shortener Architecture](./db839bb4-a14e-43dc-b836-89e01c0cc7f0.png)
-
 **Legend:**
 
 - User → Clients (desktop, mobile)
