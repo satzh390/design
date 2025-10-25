@@ -22,7 +22,7 @@ My goals with this repo:
 | **Failure Detection Algorithms** | [FailureDetection](./failureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
 | **Replica consistency Algorithms** | [ReplicaConsistency](./replicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
 | **ID Generator** | [IdGenerator](./idGenerator) | Implementation of unique, time-ordered ID generation algorithms including Twitter Snowflake–style generator for distributed systems. |
-| **URL Shortner** | [IdGenerator](./urlShortner) | Implementation of a scalable URL shortening service, supporting high-throughput, low-latency operations. |
+| **URL Shortner** | [UrlShortner](./urlShortner) | Implementation of a scalable URL shortening service, supporting high-throughput, low-latency operations. |
 
 ---
 
