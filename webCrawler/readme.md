@@ -66,6 +66,8 @@ A good web crawler must satisfy the following core characteristics:
 
 ## 🧠 Design Components (High-Level)
 
+![HLD](https://github.com/satzh390/design-diagram/blob/main/WebCrawler-HighLevelFlow.drawio.png)
+
 | **Component** | **Responsibility** |
 |----------------|--------------------|
 | **URL Frontier** | Manages URLs to be crawled, prioritizes new vs. revisited URLs |
