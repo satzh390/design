@@ -260,8 +260,6 @@ Spark provides better latency and incremental aggregation, while MapReduce handl
 ## 📚 References
 
 - [Prefixy: Scalable Prefix Search Service](https://medium.com/@prefixyteam/how-we-built-prefixy-a-scalable-prefix-search-service-for-powering-autocomplete-c20f98e2eff1)
-- [Designing a Search Autocomplete System - Grokking the System Design Interview](https://www.educative.io/courses/grokking-modern-system-design-interview-for-engineers-managers/mE2Jjv6R8nY)
-- [Google Research: Efficient Trie-based Autocomplete Systems](https://research.google.com/pubs/archive.html)
 
 ---
 
