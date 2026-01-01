@@ -17,7 +17,7 @@ My goals with this repo:
 |-------|------------|------------|
 | **Hashing** | [Hashing](./hashing) | Data distribution and hash-based structures. |
 | **Rate Limiter** | [RateLimiter](./rateLimiter) | Implementation of rate limiting algorithms. |
-| **Filter** | [Filter](./filter) | Filtering patterns and implementations for data streams and requests. |
+| **Storage** | [Storage](./storage) | Filtering, Quadtree implementations. |
 | **Consensus Algorithms** | [Consensus](./consensus) | Quorum-based and other consensus techniques for distributed systems. |
 | **Failure Detection Algorithms** | [FailureDetection](./failureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
 | **Replica consistency Algorithms** | [ReplicaConsistency](./replicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |

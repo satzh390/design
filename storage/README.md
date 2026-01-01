@@ -19,7 +19,7 @@ BloomFilter bloomFilter = new BloomFilter(expectedMaxElements, expectedFalsePosi
 
 ---
 
-# Quadtree
+# Quadtree Implementation
 
 A **Quadtree** is a tree data structure used to partition a **2D space** by recursively dividing it into **four equal quadrants**.
 
