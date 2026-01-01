@@ -66,6 +66,8 @@ A good web crawler must satisfy the following core characteristics:
 
 ## 🧠 Design Components (High-Level)
 
+![HLD](https://github.com/satzh390/design-diagram/blob/main/WebCrawler-HighLevelFlow.drawio.png)
+
 | **Component** | **Responsibility** |
 |----------------|--------------------|
 | **URL Frontier** | Manages URLs to be crawled, prioritizes new vs. revisited URLs |
@@ -75,18 +77,6 @@ A good web crawler must satisfy the following core characteristics:
 | **Storage** | Stores HTML pages for up to 5 years |
 | **Scheduler** | Decides crawl timing, ensures politeness, and handles recrawling |
 | **Indexer** | Processes and indexes content for search engine use |
-
----
-
-## 📦 System Characteristics
-
-| **Aspect** | **Description** |
-|-------------|-----------------|
-| **Scale** | 1 Billion Pages / Month |
-| **Storage Retention** | 5 Years |
-| **Content Type** | HTML |
-| **Duplicate Handling** | Ignore Duplicate Pages |
-| **Key Qualities** | Scalable, Robust, Polite, Extensible |
 
 ---
 
@@ -102,13 +92,230 @@ A good web crawler must satisfy the following core characteristics:
 
 ---
 
-## 🧩 Challenges to Address
+# 🕸️ Step 3 - Design Deep Dive
 
-- Efficiently managing **billions of URLs**
-- Ensuring **fault tolerance** across distributed systems
-- Handling **duplication** and **spam pages**
-- Maintaining **crawl politeness**
-- Ensuring **data freshness** with periodic re-crawling
+In this chapter, we go beyond the high-level overview and explore the **core design components** and **technical decisions** behind a scalable and efficient web crawler.
+
+---
+
+## 📚 Table of Contents
+- [DFS vs BFS](#-dfs-vs-bfs)
+- [URL Frontier](#-url-frontier)
+  - [Politeness](#politeness)
+  - [Priority](#priority)
+  - [Freshness](#freshness)
+  - [Storage for URL Frontier](#storage-for-url-frontier)
+- [HTML Downloader](#-html-downloader)
+  - [Robots.txt](#robotstxt)
+  - [Performance Optimization](#performance-optimization)
+- [Robustness](#-robustness)
+- [Extensibility](#-extensibility)
+- [Detect and Avoid Problematic Content](#-detect-and-avoid-problematic-content)
+- [References](#-references)
+
+---
+
+## 🔍 DFS vs BFS
+
+You can think of the **web as a directed graph**:
+- **Nodes** → Web pages  
+- **Edges** → Hyperlinks (URLs)
+
+The crawl process is equivalent to traversing this graph.
+
+### Why BFS is preferred over DFS
+- **DFS** may go too deep within a single domain.
+- **BFS** ensures balanced, broad coverage across multiple sites.
+
+BFS uses a **FIFO (First-In-First-Out)** queue, but naive BFS has two key issues:
+1. Many links belong to the same host, flooding that domain with requests.  
+2. BFS treats all URLs equally — it ignores priority or quality.
+
+To address this, we introduce the **URL Frontier**.
+
+---
+
+## 🌐 URL Frontier
+
+A **URL Frontier** is a data structure responsible for managing URLs to be crawled.
+
+### Goals
+- Enforce **politeness** (avoid overloading servers)
+- Support **prioritization** (important pages first)
+- Maintain **freshness** (recrawl updated pages efficiently)
+
+---
+
+### 🕊️ Politeness
+
+Politeness prevents flooding the same host with multiple simultaneous requests.
+
+> **Key principle:** Only download one page at a time per host, with delays between downloads.
+
+#### Design Overview
+
+| Component | Description |
+|------------|-------------|
+| **Queue Router** | Ensures each queue holds URLs from a single host. |
+| **Mapping Table** | Maps hosts to queues. |
+| **FIFO Queues (b1...bn)** | Each queue processes URLs from the same host. |
+| **Queue Selector** | Maps queues to worker threads. |
+| **Worker Threads** | Each thread sequentially downloads from one queue. |
+
+**Example Mapping Table**
+
+| Host | Queue |
+|------|--------|
+| wikipedia.com | b1 |
+| apple.com | b2 |
+| nike.com | bn |
+
+---
+
+### 🎯 Priority
+
+Different URLs have different levels of importance.
+
+Example:  
+- `apple.com` homepage > random discussion forum post about Apple.
+
+| Component | Role |
+|------------|------|
+| **Prioritizer** | Calculates importance metrics (PageRank, update frequency, traffic). |
+| **Priority Queues (f1...fn)** | Queues ordered by priority. |
+| **Queue Selector** | Picks URLs with bias toward higher priority. |
+
+---
+
+### 🕰️ Freshness
+
+Web content changes frequently.  
+The crawler must **recrawl** periodically to stay up to date.
+
+**Optimization Strategies**
+- Recrawl based on **update history**.
+- Prioritize and **recrawl important pages** more frequently.
+- Avoid full re-crawls to save bandwidth and time.
+
+---
+
+### 💾 Storage for URL Frontier
+
+Real-world crawlers handle **hundreds of millions of URLs**, so storage must balance **speed and durability**.
+
+| Approach | Advantage |
+|-----------|------------|
+| **In-memory only** | Fast but not scalable or durable. |
+| **Disk only** | Durable but slow. |
+| **Hybrid (recommended)** | Stores bulk on disk, uses in-memory buffers for I/O. |
+
+---
+
+## 🌍 HTML Downloader
+
+The **HTML Downloader** is responsible for fetching web pages via HTTP.  
+Before downloading, it checks the site’s **robots.txt** rules.
+
+---
+
+### 🤖 Robots.txt
+
+The **Robots Exclusion Protocol** specifies which pages are crawlable.
+
+Example from [Amazon’s robots.txt](https://www.amazon.com/robots.txt):
+
+```text
+User-agent: Googlebot
+Disallow: /creatorhub/*
+Disallow: /rss/people/*/reviews
+Disallow: /gp/pdp/rss/*/reviews
+Disallow: /gp/cdp/member-reviews/
+Disallow: /gp/aw/cr/
+```
+Crawlers should cache robots.txt results and refresh them periodically to reduce overhead.
+
+---
+
+## ⚡ Performance Optimization
+
+### 1. Distributed Crawl
+- Crawl jobs are **partitioned and distributed** across multiple servers.  
+- Each server handles a **subset of URLs** independently.
+
+
+---
+
+### 2. Cached DNS Resolver
+- DNS lookups are **slow (10–200ms)**.  
+- Maintain a **local DNS cache** to avoid repetitive resolutions.
+
+---
+
+### 3. Locality
+- Deploy crawl servers **geographically closer** to target sites to improve latency.
+
+---
+
+### 4. Short Timeout
+- Set a **maximum wait time** for slow or unresponsive servers.  
+- Prevents threads from blocking and ensures timely job rotation.
+
+---
+
+## 🧱 Robustness
+
+A large-scale crawler must gracefully handle **failures, crashes, and data corruption**.
+
+| Technique | Description |
+|------------|-------------|
+| **Consistent Hashing** | Evenly distributes load among crawler nodes. |
+| **Persist Crawl State** | Saves progress to resume after failure. |
+| **Exception Handling** | Prevents thread crashes. |
+| **Data Validation** | Detects malformed or duplicate data. |
+
+---
+
+## 🧩 Extensibility
+
+The system should support **plug-and-play modules** for new content types.
+
+**Example extensions:**
+- 🖼️ **PNG Downloader** → Fetch image files  
+- 🔍 **Web Monitor** → Detect copyright or trademark violations  
+
+---
+
+## 🚫 Detect and Avoid Problematic Content
+
+Web crawlers must detect and filter **redundant, harmful, or useless content**.
+
+### 1. Redundant Content
+- ~30% of the web consists of **duplicate content**.  
+- Use **hashes or checksums** to detect identical pages.
+
+---
+
+### 2. Spider Traps
+Infinite loops such as:
+http://trap.com/foo/bar/foo/bar/foo/bar/...
+**Prevention Techniques:**
+- Limit maximum URL depth.  
+- Detect unusually large URL counts per domain.  
+- Apply **custom domain-specific filters**.
+
+---
+
+### 3. Data Noise
+- Filter out **ads, spam, and irrelevant code snippets** to improve data quality.
+
+---
+
+## 📘 References
+
+- [Managing URL Frontiers in Large-Scale Crawling](https://research.google.com/archive/url_frontier.html)  
+- [PageRank Algorithm – Wikipedia](https://en.wikipedia.org/wiki/PageRank)  
+- [Robots Exclusion Protocol](https://en.wikipedia.org/wiki/Robots_exclusion_standard)  
+- [Consistent Hashing – Wikipedia](https://en.wikipedia.org/wiki/Consistent_hashing)
 
 ---
 
@@ -120,19 +327,6 @@ A good web crawler must satisfy the following core characteristics:
   - **Rate control**
   - **Scalability and failure recovery**
 - A well-designed crawler is **efficient**, **respectful**, and **resilient** to web unpredictability.
-
----
-
-## 📘 Summary
-
-| **Category** | **Details** |
-|---------------|-------------|
-| **Objective** | Search Engine Indexing |
-| **Crawl Volume** | 1 Billion Pages / Month |
-| **Storage Duration** | 5 Years |
-| **Content Type** | HTML |
-| **Duplicate Pages** | Ignored |
-| **Core Qualities** | Scalability, Robustness, Politeness, Extensibility |
 
 ---
 
