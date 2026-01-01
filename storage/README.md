@@ -15,6 +15,7 @@ This module provides a Java-based Bloom Filter implementation optimized for memo
 
 ```java
 BloomFilter bloomFilter = new BloomFilter(expectedMaxElements, expectedFalsePositiveProbability);
+```
 
 ---
 
