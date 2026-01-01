@@ -15,3 +15,38 @@ This module provides a Java-based Bloom Filter implementation optimized for memo
 
 ```java
 BloomFilter bloomFilter = new BloomFilter(expectedMaxElements, expectedFalsePositiveProbability);
+
+---
+
+# Quadtree
+
+A **Quadtree** is a tree data structure used to partition a **2D space** by recursively dividing it into **four equal quadrants**.
+
+## How it Works
+- Start with a single square region (root).
+- When a region exceeds a set capacity, it is subdivided into:
+  - Top-Left
+  - Top-Right
+  - Bottom-Left
+  - Bottom-Right
+- The process continues recursively.
+
+## Why Use a Quadtree
+- Efficient spatial partitioning
+- Faster range and collision queries
+- Reduces unnecessary checks in large 2D spaces
+
+## Operations
+- `insert(point)`
+- `query(range)`
+- `subdivide()`
+
+## Time Complexity
+- Average: **O(log n)**
+- Worst case: **O(n)** (highly clustered data)
+
+## Use Cases
+- Game collision detection
+- Maps and GIS systems
+- Image processing
+- Physics simulations

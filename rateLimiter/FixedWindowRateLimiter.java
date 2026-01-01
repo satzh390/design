@@ -19,6 +19,7 @@ public class FixedWindowRateLimiter {
         if (now - windowStart >= windowSizeInMillis) {
             // reset the window
             windowStart = now;
+            
             requestCount = 0;
         }
 
