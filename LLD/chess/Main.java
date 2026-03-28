@@ -7,21 +7,42 @@ public class Main {
         Player blackPlayer = new Player(2, "Bob", Color.BLACK);
         Game game = new Game(whitePlayer, blackPlayer);
 
-        try {
-            game.move(new Move(whitePlayer, new Position(1, 4), new Position(3, 4))); // e2 to e4
-            game.move(new Move(blackPlayer, new Position(6, 4), new Position(4, 4))); // e7 to e5
-            game.move(new Move(whitePlayer, new Position(0, 6), new Position(2, 5))); // Ng1 to f3
-            game.move(new Move(blackPlayer, new Position(7, 1), new Position(5, 2))); // Nb8 to c6
-            game.move(new Move(whitePlayer, new Position(0, 5), new Position(3, 2))); // Bf1 to c4
-            game.move(new Move(blackPlayer, new Position(7, 6), new Position(5, 5))); // Ng8 to f6
-            game.move(new Move(whitePlayer, new Position(0, 3), new Position(4, 7))); // Qd1 to h5 (check)
-            game.move(new Move(blackPlayer, new Position(7, 3), new Position(3, 7))); // Qd8 to h4 (check)
-            game.move(new Move(whitePlayer, new Position(0, 4), new Position(1, 4))); // Ke1 to e2 (escape check)
-            game.move(new Move(blackPlayer, new Position(5, 5), new Position(3, 4))); // Nf6 to e4 (check)
-            game.move(new Move(whitePlayer, new Position(1, 4), new Position(0, 4))); // Ke2 to e1 (escape check)
-            game.move(new Move(blackPlayer, new Position(3, 7), new Position(0, 7))); // Qh4 to h1 (checkmate)
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        game.move(new Move(whitePlayer, new Position(1, 4), new Position(3, 4))); // e2 to e4
+        game.move(new Move(blackPlayer, new Position(6, 4), new Position(4, 4))); // e7 to e5
+        game.move(new Move(whitePlayer, new Position(0, 6), new Position(2, 5))); // Ng1 to f3
+        game.move(new Move(blackPlayer, new Position(7, 6), new Position(5, 5))); // Ng8 to f6
+        game.move(new Move(whitePlayer, new Position(0, 5), new Position(3, 2))); // Bf1 to c4
+        game.move(new Move(blackPlayer, new Position(7, 5), new Position(4, 2))); // Bf8 to c5
+        game.move(new Move(whitePlayer, new Position(0, 4), new Position(1, 4))); // Ke1 to e2
+        game.move(new Move(blackPlayer, new Position(7, 4), new Position(6, 4))); // Ke8 to e7
+        game.move(new Move(whitePlayer, new Position(3, 2), new Position(6, 5))); // Bc4 to f7 (checkmate)
+        if(game.getState() != GameState.ENDED){
+            throw new AssertionError("Game should have ended with checkmate");
         }
+        System.out.println("All moves executed successfully and game ended with checkmate as expected.");
+
+        // invalid move after game ended
+        try {
+            game.move(new Move(blackPlayer, new Position(6, 4), new Position(5, 4))); // e7 to e6
+            assert false : "Move should not be allowed after game has ended";
+        } catch (IllegalStateException e) {
+            System.out.println("Caught expected exception when trying to move after game ended: " + e.getMessage());
+        }
+
+        // initialize a new game and make an invalid move (moving opponent's piece)
+        game = new Game(whitePlayer, blackPlayer);  
+        try {
+            game.move(new Move(blackPlayer, new Position(1, 4), new Position(3, 4))); // Black tries to move White's pawn
+            assert false : "Move should not be allowed when it's not the player's turn";
+        } catch (IllegalArgumentException e) {
+            System.out.println("Caught expected exception when trying to move opponent's piece: " + e.getMessage());
+        }
+
+        // make a valid move and check game state
+        game.move(new Move(whitePlayer, new Position(1, 4), new Position(3, 4))); // e2 to e4
+        if(game.getState() != GameState.ONGOING){
+            throw new AssertionError("Game state should be ongoing after first move");
+        }
+        System.out.println("First move executed successfully and game state is ongoing as expected.");
     }
 }

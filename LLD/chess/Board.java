@@ -71,25 +71,52 @@ public class Board implements Cloneable {
         }
     }
 
-    public void movePiece(Position from, Position to){
-        validatePosition(from);
-        validatePosition(to);
-        Piece piece = getPieceAt(from);
-        setPieceAt(from, null);
-        setPieceAt(to, piece);
-    }
-
-    private void validatePosition(Position position){
-        if(position.getRow() < 0 || position.getRow() >= 8 || position.getCol() < 0 || position.getCol() >= 8){
-            throw new IllegalArgumentException("Invalid position: " + position);
-        }
-    }
-
     public void resetBoard(){
         initializeBoard();
     }
 
-    public boolean isKingInCheck(Color color){
+    public void move(Move move){
+        if(!validate(move)){
+            throw new IllegalArgumentException("Invalid move: " + move);
+        }
+
+        Piece piece = getPieceAt(move.getFrom());
+        setPieceAt(move.getFrom(), null);
+        setPieceAt(move.getTo(), piece);
+    }
+
+    private boolean validMoveAfterSimulate(Move move){
+        Board tempBoard = clone();
+        Piece piece = tempBoard.getPieceAt(move.getFrom());
+        tempBoard.setPieceAt(move.getFrom(), null);
+        tempBoard.setPieceAt(move.getTo(), piece);
+        return !tempBoard.isKingInCheck(move.getPlayer().getColor());
+    }
+
+    private boolean validate(Move move) {
+        if(!validPosition(move.getFrom()) || !validPosition(move.getTo())){
+            return false;
+        }
+
+        Piece piece = getPieceAt(move.getFrom());
+        if(piece == null || !piece.getColor().equals(move.getPlayer().getColor())){
+            return false;
+        }
+
+        return piece.isValidMove(this, move.getPlayer().getColor(), move.getFrom(), move.getTo()) 
+            && validMoveAfterSimulate(move);
+    }
+
+
+    private boolean validPosition(Position position){
+        if(position.getRow() < 0 || position.getRow() >= 8 || position.getCol() < 0 || position.getCol() >= 8){
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isKingInCheck(Color color){
         Position kingPosition = color == Color.WHITE ? whiteKingPosition : blackKingPosition;
         if(kingPosition == null){
             throw new IllegalStateException("King not found for color: " + color);
@@ -153,10 +180,9 @@ public class Board implements Cloneable {
                         for(int y = 0; y < SIZE; y++){
                             Position to = new Position(x, y);
                             if(piece.isValidMove(this, color, from, to)){
-                                Board clonedBoard = this.clone();
-                                clonedBoard.movePiece(from, to);
-                                if(!clonedBoard.isKingInCheck(color)){
-                                    return false;
+                                Move move = new Move(new Player(0, "temp", color), from, to);
+                                if(validMoveAfterSimulate(move)){
+                                    return false; // found a move that can save the king
                                 }
                             }
                         }
