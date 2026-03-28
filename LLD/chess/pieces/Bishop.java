@@ -24,8 +24,8 @@ public class Bishop extends Piece {
         }
 
         // validate path is clear
-        int rowDirection = (to.getRow() - from.getRow()) / rowDiff;
-        int colDirection = (to.getCol() - from.getCol()) / colDiff;
+        int rowDirection = rowDiff == 0 ? 0 : (to.getRow() - from.getRow()) / rowDiff;
+        int colDirection = colDiff == 0 ? 0 : (to.getCol() - from.getCol()) / colDiff;
 
         for(int i=1; i<rowDiff - 1; i++){
             int intermediateRow = from.getRow() + i * rowDirection;
