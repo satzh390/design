@@ -43,7 +43,7 @@ public class Lru {
 
             Node n = cache.get(key);
             remove(n);
-            insert(n);
+            insertToFront(n);
             return n.value;
         } finally {
             lock.unlock();
@@ -64,7 +64,7 @@ public class Lru {
                 remove(n);
             }
         
-            insert(n);
+            insertToFront(n);
             cache.put(key, n);  
             return n.value;
        } finally {
@@ -82,7 +82,7 @@ public class Lru {
         node.next = null;
     }
 
-    private void insert(Node node){
+    private void insertToFront(Node node){
         Node first = head.next;
 
         first.prev = node;
