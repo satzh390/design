@@ -10,7 +10,6 @@ My goals with this repo:
 - Build a reference base that I (and others) can reuse for projects, and learning  
 
 ---
-
 ## Current Topics
 
 | Topic | Subfolders | Description |
