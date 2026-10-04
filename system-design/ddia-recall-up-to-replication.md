@@ -330,25 +330,73 @@ Typical motivations:
 
 ## Wide-column / column-family model
 
-Think:
+Think of Cassandra/Bigtable-style systems as distributed tables designed around the query pattern.
 
 ~~~text
-row key
-  ↓
-column family
-  ↓
-columns / cells
+Partition key
+     ↓
+partition (data placed together)
+     ↓
+rows ordered by clustering columns
+     ↓
+cells / columns
 ~~~
 
-Data is often organized around the queries the application needs.
+### Cassandra primary key: two different roles
 
-Examples/concepts:
+~~~sql
+PRIMARY KEY ((customer_id), order_date)
+~~~
 
-- Cassandra
-- HBase
-- Bigtable-style systems
+- **Partition key = customer_id** → determines which partition owns the data and therefore which node(s) are responsible for it.
+- **Clustering key = order_date** → orders rows inside that partition and makes range/prefix queries efficient within that partition.
 
-**Important:** wide-column / column-family stores are not the same thing as analytical **column-oriented storage**.
+~~~text
+customer_id = 10
+    |
+    +-- order_date = Jan 1 → order A
+    +-- order_date = Jan 5 → order B
+    +-- order_date = Feb 2 → order C
+~~~
+
+A query for customer_id = 10 and an order_date range can be efficient because the system first finds one partition and then uses clustering order inside it.
+
+### Composite partition key
+
+The partition key itself can contain multiple fields:
+
+~~~sql
+PRIMARY KEY ((country, customer_id), order_date)
+~~~
+
+Here:
+
+~~~text
+partition key = (country, customer_id)
+clustering key = order_date
+~~~
+
+The full primary key therefore consists of a partition-key component plus zero or more clustering columns.
+
+### Why query-driven modeling matters
+
+A distributed database cannot cheaply perform arbitrary global joins/scans for every request.
+
+~~~text
+Known query
+    ↓
+choose partition key
+    ↓
+related rows land together
+    ↓
+query one/few partitions
+    ↓
+use clustering order to narrow the scan
+~~~
+
+**Interview rule:** For Cassandra-style databases, start from the queries/access patterns and design the table to make those queries efficient.
+
+**Important:** wide-column/column-family storage is not the same thing as analytical column-oriented storage.
 
 ---
 
