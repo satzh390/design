@@ -1484,78 +1484,71 @@ It does **not** mean:
 
 # 5.19 Read repair
 
-During a read, replicas may return different versions.
-
-Example:
-
+Suppose a read contacts three replicas:
 ~~~text
-R1 → version 5
-R2 → version 5
-R3 → version 3
+R1 → V5
+R2 → V5
+R3 → V3
 ~~~
 
-The system can repair R3 while serving the read.
+The system can return V5 and also repair R3 by sending V5 to it.
 
-~~~text
-R3 ← version 5
-~~~
+So: **read repair = use a normal read as an opportunity to repair a stale replica.**
 
-Reads therefore contribute to convergence.
+It helps frequently accessed keys, but a key that is never read will not be repaired by read repair.
 
 ---
 
 # 5.20 Anti-entropy
 
-Background process that compares replicas and synchronizes differences.
+Anti-entropy is **background synchronization between replicas**. It does not require a client to read the key.
 
-Useful when normal replication did not deliver an update.
+~~~text
+Replica A ←→ Replica B
+       compare state
+             ↓
+       synchronize differences
+~~~
 
 ### Merkle trees
 
-Instead of comparing every record:
-
+Comparing every key between huge replicas is expensive. A Merkle tree summarizes groups of keys using hashes:
 ~~~text
-             root hash
-            /         \
-        hash A       hash B
-        /   \        /   \
-      ...   ...    ...   ...
+              root
+             /    \
+          hash     hash
+          / \      / \
+        ... ...  ... ...
 ~~~
 
-If subtree hashes match:
+If a subtree hash matches, that whole region can be skipped. If it differs, descend into that subtree until the differing region is found.
 
-> The entire subtree is probably identical.
-
-If they differ:
-
-> Descend and find the differing region.
-
-This reduces the amount of data that must be compared.
+**Mental model:** Merkle tree = quickly locate which parts of two replicas differ, without comparing every record.
 
 ---
 
 # 5.21 Hinted handoff
 
-A replica is temporarily unavailable.
-
-Instead of losing the write:
+Suppose R2 is temporarily unavailable.
 
 ~~~text
-R2 = DOWN
+R1 ← write
+R3 ← write
 
-Client
-  |
-  +--> R1
-  +--> R3
-  |
-  +--> temporary holder for R2
+R2 = unavailable
+~~~
+
+Another node can temporarily store a **hint** saying that the update belongs to R2.
+
+~~~text
+temporary holder
+       ↓
+      R2
 ~~~
 
 When R2 returns, the temporary holder forwards the missed update.
 
-Mental model:
-
-> **"I'll temporarily hold your data until you come back."**
+**Mental model:** temporary storage on behalf of a failed replica. It improves availability, but adds recovery and synchronization work.
 
 ---
 
