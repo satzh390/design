@@ -565,69 +565,89 @@ Purpose:
 
 # 3.3 SSTable
 
-**Sorted String Table**
-
-A file containing key/value entries sorted by key.
+**SSTable = Sorted String Table.**
+An SSTable is an **immutable file whose records are sorted by key**.
 
 ~~~text
-A → ...
-B → ...
-C → ...
-D → ...
+A → 10
+B → 20
+C → 30
+D → 40
 ~~~
 
-Why sorted?
+### Why sorted?
 
-- Efficient range scans
-- Efficient merging
-- Efficient compaction
-- Can use sparse indexes
+Sorted order makes range scans, merging, sparse indexing and compaction efficient.
+For a range C–F, the engine can jump near C and scan forward instead of scanning the entire file.
 
+### Why immutable?
+
+The database does not update an existing SSTable in place. New SSTables are created and later merged during compaction. This makes reads and background merging simpler.
+
+**Mental model:** SSTable = sorted + immutable + disk-resident.
 ---
 
 # 3.4 LSM Tree
 
-**Log-Structured Merge-Tree**
+**LSM = Log-Structured Merge-Tree.**
 
-Core idea:
+The useful mental model is: **writes accumulate in memory, become immutable sorted files, and those files are continuously merged in the background.**
 
-> Buffer writes in memory, flush sorted immutable files, and compact them in the background.
-
-Simplified:
+### Write path
 
 ~~~text
-              Writes
-                ↓
-          Memtable (RAM)
-                ↓ flush
-             SSTable
-                ↓
-        background compaction
-                ↓
-       larger sorted SSTables
+Client write
+    ↓
+Memtable (RAM)
+    ↓ when full
+immutable SSTable
+    ↓
+more SSTables accumulate
+    ↓
+background compaction
+    ↓
+fewer/larger SSTables
 ~~~
 
-Typical read path:
+A WAL/durable log is commonly used so a write held in memory can be recovered after a crash.
+
+### Read path
+
+A lookup may check the current memtable and several SSTables. Indexes and Bloom filters reduce unnecessary file checks.
+
+### How compaction works
+
+Because SSTables are sorted, files can be merged like merge-sort:
 
 ~~~text
-Memtable
-   ↓
-Recent SSTables
-   ↓
-Older SSTables
+SSTable 1:        SSTable 2:
+A=1               B=2
+C=3               C=30
+E=5               D=4
+
+             ↓ merge
+
+A=1
+B=2
+C=30   ← newer value
+D=4
+E=5
 ~~~
 
-### Why LSM is good for writes
+Old C=3 can be discarded when it is safe. The result is another sorted immutable SSTable.
 
-Sequential/append-oriented writes are cheaper than random disk updates.
+### Why LSM is attractive
 
-### Costs
+Writes avoid repeatedly modifying random disk pages. They can be accumulated and flushed as sorted files, which is often write-friendly.
 
-- Compaction consumes I/O
-- Reads may check multiple structures
-- Write amplification
-- Space amplification
+### The price
 
+- **Write amplification:** data may be rewritten during multiple compactions.
+- **Read amplification:** a lookup may inspect several SSTables.
+- **Space amplification:** old and new versions can coexist temporarily.
+- **Compaction I/O:** background merging consumes disk/CPU resources.
+
+**Mental model:** LSM = write-friendly storage + background merge cost.
 ---
 
 ## Bloom filter
@@ -797,35 +817,45 @@ Useful for text search.
 
 # 3.10 Column-oriented storage
 
-**Do not confuse with wide-column databases.**
+**Column-oriented storage** is a physical layout optimized for analytical workloads.
 
-Column-oriented analytics:
-
+Row-oriented:
 ~~~text
-row store:
-R1: A B C
-R2: A B C
-R3: A B C
+Row1: A B C D
+Row2: A B C D
+Row3: A B C D
+~~~
 
-column store:
+Column-oriented:
+~~~text
 A: A A A
 B: B B B
 C: C C C
+D: D D D
 ~~~
 
-Excellent for analytical queries that read a few columns across many rows.
+If an analytical query needs only B and D from 1 billion rows, a column store can read B and D instead of loading every column.
 
-Benefits:
+### Why it is good for OLAP
 
-- Less data read
-- Compression
-- Vectorized processing
-- Efficient aggregation
+- fewer bytes read
+- similar values compress well
+- efficient vectorized operations
+- fast large aggregations
 
-Typical workload:
+### Why row storage is usually better for OLTP
 
-> OLAP / analytics
+A transactional request often wants one complete record. Row storage keeps fields of a record together, making point reads and updates natural.
 
+### Do not confuse
+
+~~~text
+Wide-column database
+→ distributed data model / partitioning
+
+Column-oriented database
+→ physical storage layout / analytical scan optimization
+~~~
 ---
 
 ## Row store vs column store
