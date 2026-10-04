@@ -96,8 +96,9 @@ Important load parameters:
 
 ### Latency vs response time
 
-- **Latency:** time for a request to be processed / delayed by the system.
-- **Response time:** what the client observes end-to-end.
+- **Latency:** the delay between a request and its response; in practice, this is often used to mean the end-to-end delay.
+- **Response time:** the total time the client observes from sending the request until receiving the response.
+- For interviews, the key point is that **tail latency** can be much worse than the average.
 
 ### Percentiles
 
@@ -362,7 +363,7 @@ cells / columns
 PRIMARY KEY ((customer_id), order_date)
 ~~~
 
-- **Partition key = customer_id** → determines which partition owns the data and therefore which node(s) are responsible for it.
+- **Partition key = customer_id** → determines which partition the rows belong to; partitioning/replication then maps that partition to one or more nodes.
 - **Clustering key = order_date** → orders rows inside that partition and makes range/prefix queries efficient within that partition.
 
 ~~~text
@@ -481,9 +482,11 @@ Typical relational approach.
 
 ### Schema-on-read
 
-Interpret structure when reading.
+Interpret or apply the expected structure when reading the data.
 
 Useful for heterogeneous / evolving data.
+
+**Recall:** schema-on-write = enforce/transform before storage; schema-on-read = interpret when consumed.
 
 ---
 
@@ -598,7 +601,7 @@ For a range C–F, the engine can jump near C and scan forward instead of scanni
 
 The database does not update an existing SSTable in place. New SSTables are created and later merged during compaction. This makes reads and background merging simpler.
 
-**Mental model:** SSTable = sorted + immutable + disk-resident.
+**Mental model:** SSTable = **sorted + immutable + disk-resident**. It is a storage structure/file, not the whole LSM tree.
 ---
 
 # 3.4 LSM Tree
@@ -661,7 +664,7 @@ Writes avoid repeatedly modifying random disk pages. They can be accumulated and
 - **Space amplification:** old and new versions can coexist temporarily.
 - **Compaction I/O:** background merging consumes disk/CPU resources.
 
-**Mental model:** LSM = write-friendly storage + background merge cost.
+**Mental model:** LSM = **memtable + immutable SSTables + background compaction**. The merge/compaction work is the price paid for write-friendly ingestion.
 ---
 
 ## Bloom filter
@@ -852,8 +855,8 @@ If an analytical query needs only B and D from 1 billion rows, a column store ca
 
 ### Why it is good for OLAP
 
-- fewer bytes read
-- similar values compress well
+- fewer irrelevant bytes read
+- values in the same column often compress well
 - efficient vectorized operations
 - fast large aggregations
 
@@ -1094,11 +1097,11 @@ Followers may serve reads.
 
 ### Synchronous
 
-Leader waits for replica acknowledgement.
+Leader waits for the required replica acknowledgement(s) before acknowledging the write.
 
 Pros:
 
-- Stronger durability guarantee
+- Can provide stronger durability/consistency guarantees, depending on what the acknowledgement actually means and how many replicas are required
 
 Cons:
 
@@ -1369,11 +1372,11 @@ R = 2
 2 + 2 > 3
 ~~~
 
-The write set and read set must overlap.
+The write set and read set must overlap when **W + R > N** (for the normal fixed replica set for that key).
 
 ### What quorum gives you
 
-It gives an **overlap property** that makes it possible for a read to encounter a replica that participated in the write.
+It gives an **overlap property**: the read and write sets share at least one replica, so the read can encounter a replica that acknowledged the write.
 
 ### What quorum does NOT give you automatically
 
@@ -1421,7 +1424,9 @@ and neither write causally depends on the other.
 
 They are **concurrent**.
 
-The system may need to preserve multiple versions until conflict resolution occurs.
+The system may need to preserve multiple versions until it can determine their causal relationship and/or resolve the conflict.
+
+**Important:** quorum does not serialize concurrent writes. If a conditional update must behave as one atomic, globally ordered operation, a stronger coordination mechanism is required (for example, a linearizable compare-and-set/consensus-backed operation).
 
 ---
 
@@ -1474,7 +1479,7 @@ Replica C ─┘
 
 Eventual consistency means:
 
-> Replicas eventually converge, assuming the system continues operating and no new conflicting updates keep arriving.
+> If updates stop and propagation continues, replicas eventually converge to the same value/state.
 
 It does **not** mean:
 
@@ -1552,25 +1557,17 @@ When R2 returns, the temporary holder forwards the missed update.
 
 ---
 
-# 5.22 Replication: consistency spectrum
+# 5.22 Replication: consistency guarantees
 
-Think in terms of requirements rather than "consistent/inconsistent."
+Do not treat consistency as one simple ladder where every guarantee is strictly stronger or weaker than every other one. They describe different properties.
 
-~~~text
-Stronger guarantees
-      ↑
-      |  linearizable / strong
-      |
-      |  read-after-write
-      |  monotonic reads
-      |  consistent prefix
-      |
-      |  eventual consistency
-      ↓
-Weaker guarantees
-~~~
+- **Linearizability:** operations appear to take effect atomically in one real-time order.
+- **Read-after-write:** after a client writes, its later read should see that write or something newer.
+- **Monotonic reads:** once a client has seen a version, later reads should not go backward.
+- **Consistent prefix:** a reader should not observe effects in an order that contradicts their causal/logical order.
+- **Eventual consistency:** if updates stop and propagation continues, replicas eventually converge.
 
-The exact guarantees and implementation mechanisms are separate concepts.
+**Recall:** ask “What exact guarantee does the application need?” rather than simply saying “strong vs weak consistency.”
 
 ---
 
