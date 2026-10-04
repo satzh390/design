@@ -208,20 +208,34 @@ FROM ...
 WHERE ...
 ~~~
 
-### Joins
+### Joins — what actually happens
 
-Combine related records.
+A join reconstructs a relationship that is stored separately.
 
-Common types:
+~~~text
+Customer:
+id=1, Alice
 
-- INNER JOIN → matching rows
-- LEFT JOIN → all left rows + matches
-- RIGHT JOIN → all right rows + matches
-- FULL OUTER JOIN → all rows from both sides
+Order:
+customer_id=1, amount=100
+~~~
 
-Mental model:
+The database matches customer.id = order.customer_id and produces Alice | 100.
 
-> A join reconstructs relationships that were separated across tables.
+In one database, the optimizer can choose hash join, sort-merge join, nested-loop join, indexes, and so on. SQL describes the result, not the algorithm.
+
+At distributed scale, the two sides may live on different partitions:
+
+~~~text
+Node A: Customer rows
+Node B: Order rows
+
+        ↓ network/shuffle
+
+      join
+~~~
+
+Moving large amounts of data between nodes can be expensive. This is one reason distributed NoSQL databases often prefer query-specific data placement or denormalization.
 
 ### Normalization
 
@@ -1337,19 +1351,16 @@ Common mental model: Dynamo-style systems.
 # 5.15 Quorum
 
 Let:
-
-- **N** = number of replicas
-- **W** = replicas that must acknowledge a write
+- **N** = total replicas
+- **W** = replicas required to acknowledge a write
 - **R** = replicas consulted for a read
 
-Common quorum condition:
-
+A common quorum relationship is:
 ~~~text
 W + R > N
 ~~~
 
 Example:
-
 ~~~text
 N = 3
 W = 2
@@ -1358,21 +1369,39 @@ R = 2
 2 + 2 > 3
 ~~~
 
-Read and write quorums overlap.
+The write set and read set must overlap.
 
-### Important
+### What quorum gives you
 
-Quorum does **not** magically eliminate conflicts.
+It gives an **overlap property** that makes it possible for a read to encounter a replica that participated in the write.
 
-Concurrent writes can still create multiple versions.
+### What quorum does NOT give you automatically
 
-Quorum answers:
+Quorum does not automatically mean:
+- no concurrent writes
+- no conflicts
+- linearizability
+- one globally ordered value
 
-> How many replicas participate?
+Example:
+~~~text
+Client A → R1,R2 : x=10
+Client B → R2,R3 : x=20
+~~~
 
-Conflict resolution answers:
+Both writes may be accepted. R2 may observe both, while R1 and R3 temporarily differ.
 
-> What should the final value be?
+Keep these separate:
+~~~text
+Quorum
+→ which replicas participate?
+
+Versioning
+→ which version happened after which?
+
+Conflict resolution
+→ how do concurrent versions become one converged state?
+~~~
 
 ---
 
@@ -1398,25 +1427,38 @@ The system may need to preserve multiple versions until conflict resolution occu
 
 # 5.17 Version vectors / vector clocks
 
-Purpose:
-
-> Track causality between versions.
-
-Conceptually:
+A version vector records how much history from each replica a version has observed.
 
 ~~~text
-Version V1 → [A:1, B:0]
-Version V2 → [A:2, B:0]
-Version V3 → [A:2, B:1]
+V1 = [A:1, B:0]
+
+A makes another update:
+V2 = [A:2, B:0]
+
+B observes V2 and updates:
+V3 = [A:2, B:1]
 ~~~
 
-If one version dominates another, it is causally newer.
+V3 dominates V2 because it includes all history represented by V2 plus B's new update.
 
-If neither dominates:
+Now compare:
+~~~text
+V2 = [A:2, B:0]
+V4 = [A:1, B:1]
+~~~
 
-> They are concurrent.
+Neither vector dominates the other, so V2 and V4 are concurrent.
 
-This is more useful than blindly comparing wall-clock timestamps.
+Wall-clock timestamps tell you which timestamp is larger, but they do not reliably tell you whether one update actually observed another.
+
+Version vectors distinguish:
+~~~text
+causal: V1 → V2
+
+concurrent: V2 || V4
+~~~
+
+They detect/reason about causality; they do **not** decide how concurrent values should be merged.
 
 ---
 
