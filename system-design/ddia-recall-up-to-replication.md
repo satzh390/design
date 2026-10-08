@@ -898,136 +898,471 @@ Good for:
 
 # 4. Encoding and Evolution
 
-Data does not live forever in one format.
+Data must move between processes, machines, and storage systems. In memory, applications use objects/structs/pointers; on the wire or disk, data becomes a sequence of bytes.
 
-Applications evolve:
+**Encoding / serialization / marshalling:** converting structured data into bytes.
+
+**Decoding / deserialization / unmarshalling:** converting bytes back into structured data.
+
+The important questions are not only payload size, but also: Can another language read it? Does the decoder know the types/structure? Can readers and writers evolve independently? Can old and new versions coexist during rolling deployment?
+
+---
+
+## 4.1 UTF-8 is NOT a serialization format
+
+**UTF-8 is a character encoding, not a document/data format.** It maps Unicode characters to bytes. A character can occupy 1–4 bytes.
+
+UTF-8 itself knows nothing about objects, fields, field names, arrays, numbers, booleans, document length, or number of fields. Those concepts belong to a format such as JSON.
 
 ~~~text
-Version 1
-   ↓
-Version 2
-   ↓
-Version 3
+Application object
+      ↓
+JSON serialization
+      ↓
+JSON text
+      ↓
+UTF-8 encoding
+      ↓
+bytes
 ~~~
 
-Old data and new application code often coexist.
-
-The key requirement:
-
-> **Backward/forward compatibility.**
+**Recall:** JSON is the data format; UTF-8 is one way to encode the JSON text as bytes.
 
 ---
 
-## Encoding formats
+## 4.2 UTF-8 does NOT store a length byte before every character
 
-### Language-specific encoding
+Common misconception: because UTF-8 characters are variable length, every character has a separate length prefix. **False.**
 
-Easy within one language, but often poor for interoperability and long-term storage.
-
-### JSON / XML
-
-Human-readable and widely supported.
-
-Trade-offs:
-
-- Verbose
-- Weak typing
-- Larger payloads
-
-### Binary formats
-
-Examples:
-
-- Protocol Buffers
-- Avro
-- Thrift
-
-Benefits:
-
-- Compact
-- Schema-aware
-- Efficient
-
----
-
-## Schema evolution
-
-Suppose old schema:
+UTF-8 uses bit patterns in the first byte to tell the decoder whether the character occupies 1, 2, 3, or 4 bytes.
 
 ~~~text
-User {
-  name
-}
+1 byte → 0xxxxxxx
+2 bytes → 110xxxxx 10xxxxxx
+3 bytes → 1110xxxx 10xxxxxx 10xxxxxx
+4 bytes → 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 ~~~
 
-New schema:
+So UTF-8 does not add a separate length byte to every character.
+
+---
+
+## 4.3 JSON: self-describing but text-heavy
+
+JSON carries structure and field names in the payload itself:
+
+~~~json
+{"name":"Sathish","age":32,"active":true}
+~~~
+
+The overhead comes from field names, punctuation, and textual representations of values. **It is not because UTF-8 adds a length prefix before each character.**
+
+JSON is popular because it is human-readable, language-independent, and easy to debug, but it is often more verbose than schema-based binary formats.
+
+---
+
+## 4.4 BSON: binary document encoding
+
+**BSON = Binary JSON**, commonly used by MongoDB. BSON is not simply "UTF-8 but smaller". It represents a document as a binary structure containing information such as:
 
 ~~~text
-User {
-  name
-  age
-}
+[document length]
+[type][field name][value]
+[type][field name][value]
+...
+[end]
 ~~~
 
-Old data may not contain age.
+BSON still carries field names, so it remains relatively self-describing.
 
-Therefore:
+### Why MongoDB uses BSON
 
-- New fields need sensible defaults
-- Removing/renaming fields requires care
-- Readers and writers must tolerate different versions
+1. **Typed values** — BSON has explicit types such as int32, int64, double, Decimal128, date, binary, and ObjectId.
+2. **Binary structure** — the database can work with typed binary values instead of first interpreting a textual JSON representation.
+3. **Document length/structure** — encoded length helps parsers know document boundaries and traverse the representation.
+4. **Richer types than standard JSON** — for example Decimal128, binary data, ObjectId, and BSON dates.
+5. **Good fit for MongoDB's document model.**
 
----
+### BSON is NOT necessarily smaller than JSON
 
-## Backward compatibility
-
-New code can read old data.
-
-## Forward compatibility
-
-Old code can tolerate data written by newer code.
-
----
-
-## REST / RPC
-
-### REST
-
-Resource-oriented communication, commonly over HTTP.
-
-### RPC
-
-Call a remote service as if invoking a local method.
-
-But remote calls differ from local calls because of:
-
-- network latency
-- timeouts
-- partial failure
-- serialization
-- retries
-- versioning
+BSON can be larger for some documents because it stores type information, field names, and structural metadata. Its primary purpose is **not compression**.
 
 **Mental model:**
 
-> A remote call is not a local function call with extra syntax.
+~~~text
+JSON + UTF-8
+→ textual, self-describing representation
+
+BSON
+→ binary, typed, self-describing document representation
+~~~
 
 ---
 
-## Dataflow through databases
+## 4.5 JSON numbers vs BSON numeric types
 
-Data can flow through:
+JSON defines a general numeric grammar: **number**. It does not define separate wire types such as int32, int64, float64, or Decimal128.
 
-### Database
-One version of application writes; another reads later.
+A particular JSON parser may choose how to represent a number internally. Many environments use IEEE-754 double precision, which cannot exactly represent every large integer or high-precision decimal.
 
-### Services
-Service A → RPC → Service B.
+So:
 
-### Message brokers
-Producer → broker → consumer.
+> A JSON number with many digits is not automatically a high-precision Decimal128 value.
 
-Compatibility must survive across the entire dataflow.
+BSON can explicitly represent types such as Int32, Int64, Double, and Decimal128. This matters when exact decimal precision is important, such as monetary values.
+
+**Recall:** JSON says "number"; BSON can say "this is specifically Decimal128." 
+
+---
+
+## 4.6 Schema-based binary formats
+
+Formats such as **Protocol Buffers (Protobuf), Apache Thrift, and Avro** can be much more compact because the reader and writer can rely on a schema.
+
+Instead of repeatedly sending:
+
+~~~text
+"name" → "Sathish"
+"age"  → 32
+~~~
+
+a Protobuf schema can define:
+
+~~~protobuf
+message Person {
+  string name = 1;
+  int32 age = 2;
+}
+~~~
+
+The payload can use compact **field numbers/tags** rather than sending the complete field name each time.
+
+**Progression:**
+
+~~~text
+JSON
+→ field names + text structure
+
+BSON
+→ field names + binary types/structure
+
+Protobuf / Thrift
+→ field IDs + compact typed encoding
+
+Avro
+→ schema-driven encoding without per-field IDs in the normal binary encoding
+~~~
+
+---
+
+## 4.7 Protobuf field tags / wire types
+
+A Protobuf field has a **field number** and a **wire type**. Conceptually:
+
+~~~text
+tag + encoded value
+~~~
+
+Not every field is `tag + length + value`.
+
+~~~text
+varint field
+→ tag + varint value
+
+length-delimited field
+→ tag + length + bytes
+
+fixed32
+→ tag + 4 bytes
+
+fixed64
+→ tag + 8 bytes
+~~~
+
+So a length prefix applies to **length-delimited** values, not every Protobuf field.
+
+---
+
+## 4.8 Why Protobuf/Thrift field IDs help schema evolution
+
+Suppose:
+
+~~~protobuf
+message User {
+  string name = 1;
+  int32 age = 2;
+}
+~~~
+
+Later add `string email = 3;`. Old readers can ignore the unknown field 3. New readers can handle old messages where field 3 is absent according to the format's presence/default semantics.
+
+### Critical rule
+
+**Never casually reuse an old field number for a different meaning.** When a Protobuf field is removed, reserving its number/name is a common safety practice so it cannot accidentally be reused.
+
+**Recall:**
+
+~~~text
+Field number = stable identity
+Field name   = human-readable label
+~~~
+
+The stable identity is what makes evolution robust.
+
+---
+
+## 4.9 Thrift
+
+Thrift is another schema-based serialization/RPC ecosystem. A Thrift field carries a field ID/type and value in its binary protocols. Thrift supports structured types such as structs, lists, sets, and maps.
+
+The key recall point is:
+
+> **Stable field IDs allow fields to be added/removed while old and new versions can coexist, provided the schema-evolution rules are respected.**
+
+---
+
+## 4.10 Avro: the key difference
+
+Avro is also schema-based, but unlike Protobuf/Thrift it does not normally put a field ID/tag beside every field in its binary encoding.
+
+~~~text
+Protobuf / Thrift
+→ identify fields using stable IDs/tags
+
+Avro
+→ schema determines what the next encoded value means
+~~~
+
+This makes Avro very compact, but schema evolution is handled through **writer schema + reader schema + schema resolution**.
+
+---
+
+## 4.11 Avro: why deleting a field does NOT shift values incorrectly
+
+A tempting but incorrect mental model is:
+
+> "Avro is positional, so if I delete a field, every later value shifts and the reader assigns it to the wrong field."
+
+**That is not how Avro schema evolution works.**
+
+Avro has:
+
+~~~text
+Writer schema
+      ↓
+describes how bytes were written
+      ↓
+serialized bytes
+      ↓
+Reader schema
+      ↓
+reader
+~~~
+
+The reader uses the **writer schema and reader schema** together to resolve differences.
+
+Example:
+
+~~~text
+Writer schema: name, age, email
+Reader schema: name, age
+~~~
+
+The writer can encode `name → age → email`. The reader knows the writer schema, so it can consume the email value and ignore it because `email` is absent from the reader schema.
+
+It does **not** blindly treat email's bytes as the next reader field.
+
+---
+
+## 4.12 Avro: adding a field
+
+Suppose:
+
+~~~text
+Writer: name, age
+Reader: name, age, email
+~~~
+
+The writer has no `email`. The reader can supply a value from a **default** specified in the reader schema when appropriate.
+
+~~~text
+email → default ""
+~~~
+
+**Recall:** defaults matter when the reader expects a field that is missing from the writer data.
+
+---
+
+## 4.13 Avro: deleting a field
+
+Suppose:
+
+~~~text
+Old writer: name, age, email
+New reader: name, age
+~~~
+
+The reader does not need `email`. Avro schema resolution can ignore fields that exist in the writer schema but not the reader schema.
+
+**No tombstone/dummy field is required merely because the reader removed the field.**
+
+---
+
+## 4.14 Avro: reordering fields
+
+Writer:
+
+~~~text
+name, age, email
+~~~
+
+Reader:
+
+~~~text
+email, name, age
+~~~
+
+The physical writer encoding still follows the writer schema. The reader uses schema resolution to match fields by schema name rather than assuming that the first physical value must be the first field in the reader schema.
+
+Therefore, reordering fields in the reader schema does not by itself make values land in the wrong fields.
+
+---
+
+## 4.15 Avro evolution mental model
+
+Remember:
+
+~~~text
+             Writer
+               |
+         Writer schema
+               |
+               v
+        serialized bytes
+               |
+               v
+         Reader schema
+               |
+             Reader
+~~~
+
+Useful recall rules:
+
+- Reader field missing from writer → needs a suitable default/presence rule.
+- Writer field missing from reader → reader can ignore it.
+- Field matching is based on schema names/resolution, not simply reader position.
+- Type changes are allowed only when a compatible schema-resolution/promotion rule exists.
+
+---
+
+## 4.16 Text vs self-describing binary vs schema-based binary
+
+| Format | Field names in payload? | External schema required? | Main idea |
+|---|---:|---:|---|
+| JSON | Yes | No | Human-readable, self-describing text |
+| BSON | Yes | No | Typed binary document |
+| Protobuf | No; field numbers | Yes | Compact tagged binary |
+| Thrift | No; field IDs | Yes | Compact tagged binary |
+| Avro | No | Yes | Schema-driven binary + schema resolution |
+
+**Important:** BSON and JSON carry enough metadata in each document to decode without an external application schema. Protobuf/Thrift/Avro rely much more heavily on an agreed schema.
+
+---
+
+## 4.17 Encoding is not compression
+
+Do not mix these concepts:
+
+~~~text
+Encoding
+→ represents data in a defined format
+
+Compression
+→ reduces the number of bytes needed to represent that data
+~~~
+
+A binary format can be compact without being a compression algorithm. Protobuf + gzip is still possible, for example.
+
+---
+
+## 4.18 RPC and HTTP/2
+
+**RPC is a communication model, not a specific wire protocol.** gRPC commonly uses HTTP/2.
+
+~~~text
+Application
+    ↓
+gRPC / RPC
+    ↓
+HTTP/2
+    ↓
+TCP
+    ↓
+IP
+~~~
+
+### Why HTTP/2 helps RPC
+
+HTTP/2 supports **multiplexing**:
+
+~~~text
+One TCP connection
+    |
+    +-- stream → RPC A
+    +-- stream → RPC B
+    +-- stream → RPC C
+    +-- stream → RPC D
+~~~
+
+Multiple concurrent streams can share one TCP connection. Therefore many RPCs can reuse the same connection instead of opening a new TCP connection for every request.
+
+But HTTP/2 does **not** eliminate the initial TCP connection establishment. It lets many streams share the established connection.
+
+**Recall:** RPC ≠ HTTP/2. gRPC uses HTTP/2; RPC systems can use other transports.
+
+---
+
+## 4.19 The full encoding progression
+
+~~~text
+In-memory object
+      ↓
+Need bytes for network/storage
+      ↓
+JSON + UTF-8
+      ↓
+Human-readable, interoperable, but verbose
+      ↓
+BSON
+      ↓
+Binary typed document; still carries field names
+      ↓
+Protobuf / Thrift
+      ↓
+Schema + stable field IDs → compact payloads
+      ↓
+Avro
+      ↓
+Schema-driven encoding + writer/reader schema resolution
+~~~
+
+When asked "why binary/schema-based encoding?", remember: **binary alone is not the magic; avoiding repeated textual metadata and having an agreed schema are what enable compact, efficient representations.**
+
+---
+
+## 4.20 Schema evolution: interview checklist
+
+When a schema changes, ask:
+
+1. Can new code read old data? → **backward compatibility**
+2. Can old code read new data? → **forward compatibility**
+3. How are fields identified? → name / field ID / schema resolution
+4. What happens when a field is missing? → default / absence semantics
+5. What happens when an unknown field appears? → ignore / reject, depending on format
+6. Can a field be renamed without losing identity? → depends on the format
+7. Can a field's type change? → only if a compatible conversion/resolution exists
+
+**Core idea:** schema evolution is about allowing different versions of readers and writers to coexist safely.
 
 ---
 
