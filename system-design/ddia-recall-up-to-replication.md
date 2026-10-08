@@ -111,6 +111,54 @@ Use:
 - p99 → 99% are faster
 - p99.9 → tail latency
 
+### How percentiles are calculated
+
+Start with the observed latencies and sort them from smallest to largest:
+
+~~~text
+10, 12, 15, 18, 20, 25, 30, 40, 80, 200 ms
+~~~
+
+The percentile asks:
+
+> **What latency value has approximately X% of observations at or below it?**
+
+For a simple N-observation dataset, one common nearest-rank style calculation uses:
+
+~~~text
+rank = ceil(P × N)
+~~~
+
+where P is the percentile as a fraction.
+
+Example with 1,000 requests:
+
+~~~text
+P50   → ceil(0.50 × 1000)  = 500th value
+P99   → ceil(0.99 × 1000)  = 990th value
+P99.9 → ceil(0.999 × 1000) = 999th value
+~~~
+
+So if the sorted 1,000 request latencies have:
+
+~~~text
+500th = 20 ms
+990th = 150 ms
+999th = 500 ms
+~~~
+
+then approximately:
+
+~~~text
+P50   = 20 ms
+P99   = 150 ms
+P99.9 = 500 ms
+~~~
+
+**Important:** real monitoring systems may calculate percentiles using interpolation, histograms, t-digests, HDR histograms, or other approximate algorithms. Therefore the exact value can differ slightly from the simple nearest-rank example above.
+
+Also, **P99 does not mean 99% of requests are exactly at that latency**. It means roughly 99% are at or below that latency, while roughly 1% are above it.
+
 **Tail latency matters** especially when one request fans out to many downstream services.
 
 ---
