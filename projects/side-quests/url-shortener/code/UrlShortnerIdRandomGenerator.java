@@ -1,3 +1,5 @@
+import java.nio.charset.StandardCharsets;
+import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
 public class UrlShortnerIdRandomGenerator {
@@ -59,5 +61,88 @@ public class UrlShortnerIdRandomGenerator {
         System.out.println("URL 1: " + url1 + " -> Short ID: " + id1);
         System.out.println("URL 2: " + url2 + " -> Short ID: " + id2);
         System.out.println("URL 3 (same as URL 1): " + url3 + " -> Short ID: " + id3);
+    }
+
+    private static class BloomFilter {
+        private final int n;
+        private double p = 0.5;
+        private int k;
+        private final long[] filter;
+        private final int m;
+        private final int bitSize = 64;
+
+        BloomFilter(int expectedMaxElements, double expectedFalsePositiveProbability, int k) {
+            n = expectedMaxElements;
+            p = expectedFalsePositiveProbability;
+            m = calculateM(n, k, p);
+            filter = new long[(m + bitSize - 1) / bitSize];
+            this.k = k;
+        }
+
+        void add(String key) {
+            int[] bitPositions = getFilterPos(key);
+            for (int pos : bitPositions) {
+                int segmentPos = pos / bitSize;
+                long mask = filter[segmentPos];
+                mask |= 1L << (64 - (pos % bitSize));
+                filter[segmentPos] = mask;
+            }
+        }
+
+        boolean isPresent(String key) {
+            int[] bitPositions = getFilterPos(key);
+            boolean isBitSet = true;
+            for (int pos : bitPositions) {
+                int segmentPos = pos / bitSize;
+                long mask = filter[segmentPos];
+                isBitSet &= (mask & (1L << (64 - (pos % bitSize)))) > 0;
+                if (!isBitSet) {
+                    break;
+                }
+            }
+            return isBitSet;
+        }
+
+        private int[] getFilterPos(String key) {
+            int[] hashes = new int[k];
+
+            CRC32 crc = new CRC32();
+            crc.update(key.getBytes(StandardCharsets.UTF_8));
+            int h1 = (int) crc.getValue();
+
+            Adler32 adler = new Adler32();
+            adler.update(key.getBytes(StandardCharsets.UTF_8));
+            int h2 = (int) adler.getValue();
+
+            for (int i = 0; i < k; i++) {
+                int combined = (h1 + i * h2) & 0x7fffffff;
+                hashes[i] = combined % m;
+            }
+
+            return hashes;
+        }
+
+        private static int calculateM(int n, int k, double p) {
+            if (n <= 0 || k <= 0) {
+                throw new IllegalArgumentException("n and k must be positive.");
+            }
+            if (p <= 0 || p >= 1) {
+                throw new IllegalArgumentException("False positive probability p must be between 0 and 1.");
+            }
+
+            double denominator = Math.log(1 - Math.pow(p, 1.0 / k));
+            if (denominator == 0.0) {
+                throw new IllegalArgumentException("Invalid parameters: denominator = 0");
+            }
+
+            double mDouble = -((double) k * n) / denominator;
+            if (mDouble > Integer.MAX_VALUE) {
+                throw new IllegalArgumentException(
+                    "Calculated m exceeds Integer.MAX_VALUE. Reduce n or k, or increase allowed false positive probability p."
+                );
+            }
+
+            return (int) Math.ceil(mDouble);
+        }
     }
 }
