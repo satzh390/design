@@ -1,0 +1,18 @@
+policies:
+  - key: get-user-api
+    limit: 3
+    timeUnit: SECOND
+    failMode: FAIL_OPEN 
+    algo: TOKEN_BUCKET
+
+  - key: get-subscription-api
+    limit: 6
+    timeUnit: MINUTE
+    failMode: FAIL_CLOSED
+    algo: FIXED_WINDOW
+
+  - key: get-cart-api
+    limit: 3
+    timeUnit: MINUTE
+    failMode: FAIL_OPEN 
+    algo: TOKEN_BUCKET
