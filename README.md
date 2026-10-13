@@ -1,71 +1,51 @@
-# 🎯 System Design & Coding Principles
+# System Design & Backend Engineering
 
-This repository is my personal space for exploring **design problems, coding standards, and system design principles**.  
-It contains small projects, design exercises, and implementations of key building blocks used in distributed systems and backend engineering.  
+A learning portfolio for distributed-systems fundamentals, low-level design, system-design exercises, and small Java prototypes. This repository is a collection of independent notes and examples, not a single application.
 
-My goals with this repo:
-- Showcase **clean code practices** (SOLID, design patterns, modular abstractions)  
-- Explore **low-level design** (LLD) and **system design** topics in depth  
-- Document trade-offs, edge cases, and performance considerations  
-- Build a reference base that I (and others) can reuse for projects, and learning  
+## Start here
 
----
-## Current Topics
+| If you want to… | Go to |
+|---|---|
+| Explore a backend building block or distributed-systems algorithm | [`fundamentals/`](./fundamentals/) |
+| Browse object-oriented design exercises | [`low-level-design/`](./low-level-design/) |
+| Study end-to-end system-design problems | [`system-design/`](./system-design/) |
+| Follow practical projects from design to code | [`projects/side-quests/README.md`](./projects/side-quests/README.md) |
 
-| Topic | Subfolders | Description |
-|-------|------------|------------|
-| **Hashing** | [Hashing](./hashing) | Data distribution and hash-based structures. |
-| **Rate Limiter** | [RateLimiter](./rateLimiter) | Implementation of rate limiting algorithms. |
-| **Storage** | [Storage](./storage) | Filtering, Quadtree implementations. |
-| **Consensus Algorithms** | [Consensus](./consensus) | Quorum-based and other consensus techniques for distributed systems. |
-| **Failure Detection Algorithms** | [FailureDetection](./failureDetection) | Gossip protocol, heartbeat, phi accrual, and other failure detection mechanisms. Table-based explanations and Java implementations. |
-| **Replica consistency Algorithms** | [ReplicaConsistency](./replicaConsistency) | Techniques to resolve data inconsistencies among replicas. Includes vector clocks, last-writer-wins, CRDTs, etc. |
-| **ID Generator** | [IdGenerator](./idGenerator) | Implementation of unique, time-ordered ID generation algorithms including Twitter Snowflake–style generator for distributed systems. |
-| **URL Shortner** | [UrlShortner](./urlShortner) | Implementation of a scalable URL shortening service, supporting high-throughput, low-latency operations. |
+## Fundamentals
 
----
+| Topic | What is here |
+|---|---|
+| [Consensus](./fundamentals/consensus/) | Quorum, Paxos, and Raft study notes |
+| [Failure detection](./fundamentals/failure-detection/) | Gossip implementation and failure-detection notes |
+| [Hashing](./fundamentals/hashing/) | Consistent and rendezvous hashing implementations |
+| [ID generation](./fundamentals/id-generation/) | Twitter Snowflake-style ID generator |
+| [Rate limiting](./fundamentals/rate-limiting/) | Fixed-window, leaky-bucket, sliding-window, and token-bucket examples |
+| [Replica consistency](./fundamentals/replica-consistency/) | Vector clock and Merkle tree examples, with other approaches documented |
+| [Storage](./fundamentals/storage/) | Bloom filter and quadtree examples |
 
-## 📅 Upcoming Topics
+## Low-level design
 
-I will be contributing designs and implementations for the following areas:  
+[`low-level-design/`](./low-level-design/) contains standalone Java exercises:
 
-- **Caching** (LRU/LFU cache, distributed cache strategies, cache invalidation patterns)  
-- **Load Balancing** (round robin, least connections, weighted, consistent hashing based)  
-- **Messaging & Queues** (Kafka internals, custom queue implementation, pub-sub patterns)  
-- **Database Systems** (indexing, sharding, replication models)  
-- **Concurrency & Synchronization** (thread-safe designs, lock-free structures, semaphores)  
-- **Scheduling & Job Systems** (cron-like schedulers, task queues, priority jobs)  
-- **Resiliency Patterns** (circuit breaker, retry with backoff, bulkhead, rate shaping)  
+- [LRU cache](./low-level-design/lru-cache/)
+- [Chess](./low-level-design/chess/)
+- [Tic-tac-toe](./low-level-design/tic-tac-toe/)
 
----
+## System design
 
-## 🚀 How to Use
-- Browse each folder for design-specific code and explanations.  
-- Each subfolder contains a `README.md` that explains the design, trade-offs, and usage examples.  
-- I am continuously adding new designs, examples, and improvements.  
+See the [system-design index](./system-design/README.md) for study notes and exercises. Question prompts are in [system-design/exercises/questions/](./system-design/exercises/questions/). Add an exercise folder when you have design materials to store; implementation code is kept separately in [projects/side-quests/](./projects/side-quests/).
 
----
+## Practical projects
 
-## References
-- [Grokking System design](https://drive.google.com/file/d/1lXflm5NSP9MR4XX2YKSnaOMJpPXzN5CO/view?usp=sharing)
-- [ByteByteGo Repo](https://github.com/ByteByteGoHq/system-design-101)
-- [ByteByteGo course paid](https://bytebytego.com/courses/system-design-interview)
-- [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/B08X8ZXT15)
-- [Design Pattern](https://refactoring.guru/design-patterns)
-- [System Design Primer](https://github.com/donnemartin/system-design-primer)
+[`projects/side-quests/README.md`](./projects/side-quests/README.md) tracks implementation locations and progress. The 15 system-design questions are collected in [`system-design/exercises/questions/`](./system-design/exercises/questions/); create design workspaces as you work on an exercise.
 
-----
-## 🧑‍💻 About Me 
+## Repository layout
 
-I’m **Sathish Soundararajan**, a Senior Software Engineer with 7+ years of backend & distributed system experience (Java, Spring Boot, Go, Kafka, AWS). I love solving design challenges, writing clean code, and sharing architectural insights. 
-Connect with me: 
-- [LinkedIn](https://www.linkedin.com/in/sathish-soundararajan-85a877227)
-- [LeetCode](https://leetcode.com/u/leetsatzh) | [CSES](https://cses.fi/user/259187)
+```text
+fundamentals/       Distributed-systems concepts and backend building blocks
+low-level-design/   Object-oriented design exercises
+projects/           Practical implementation prototypes
+system-design/      Design notes and end-to-end design exercises
+```
 
-----
-## Other References
-- [SSTable](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/)
-- [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)
-- [Amazon: Dynamo highly available key value store](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)
-- [Ticket Servers: Distributed Unique Primary Keys on the Cheap](https://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap/)
-- [NTP - Network time protocol](https://en.wikipedia.org/wiki/Network_Time_Protocol)
+Most core Java examples are standalone and do not share a root build. Practical projects have their own build files; see each project README for its status and run instructions. The code and documentation are for learning, not production deployment.
