@@ -1,5 +1,3 @@
-package storage;
-
 import java.util.List;
 
 public class QuadTree {

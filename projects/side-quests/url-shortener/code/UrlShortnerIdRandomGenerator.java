@@ -1,7 +1,5 @@
 import java.util.zip.CRC32;
 
-import storage.BloomFilter;
-
 public class UrlShortnerIdRandomGenerator {
     private final int idLength;
     private final BloomFilter filter;

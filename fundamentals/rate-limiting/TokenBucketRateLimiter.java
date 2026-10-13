@@ -1,5 +1,3 @@
-package rateLimiter;
-
 import java.time.Instant;
 import java.time.Duration;
 
@@ -39,6 +37,13 @@ public class TokenBucketRateLimiter {
     public synchronized double getTokens() {
         refill();
         return tokens;
+    }
+
+    public static void main(String[] args) {
+        TokenBucketRateLimiter limiter = new TokenBucketRateLimiter(2, 1);
+        System.out.println("Request 1 allowed: " + limiter.allowRequest());
+        System.out.println("Request 2 allowed: " + limiter.allowRequest());
+        System.out.println("Request 3 allowed: " + limiter.allowRequest());
     }
 }
 /*

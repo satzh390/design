@@ -1,5 +1,3 @@
-package rateLimiter;
-
 public class SlidingWindowCounterRateLimiter {
     private final int windowSizeInMillis;
     private final int numberOfBuckets;

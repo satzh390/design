@@ -32,15 +32,14 @@ Here are common rate limiting strategies you may find here:
 
 ## 🔄 Usage / How to Use
 
-1. Instantiate a rate limiter strategy with parameters (e.g. `maxRequests`, `windowSizeMs`, `bucketCapacity`).  
-2. On each request, call something like `boolean tryAcquire(key)` (or `acquire(key)`) to check/consume quota.  
-3. Handle concurrency (synchronize, atomic counters, locks) if used in multi-threaded contexts.  
-4. Optionally, reset or refresh state (for fixed-window) or cleanup old entries (for sliding window).
+Each implementation exposes `allowRequest()` to check and consume quota. Construct the
+specific strategy with its capacity and timing parameters; these are independent classes,
+not implementations of a shared `RateLimiter` interface.
 
-```java
-RateLimiter limiter = new TokenBucketRateLimiter(100 /* per min */, 200 /* burst cap */);
-if (limiter.tryAcquire(userId)) {
-    // allowed
-} else {
-    // rate limit exceeded, reject or wait
-}
+The examples can be compiled and run from the repository root with a JDK:
+
+```sh
+javac -d out fundamentals/rate-limiting/*.java
+java -cp out TokenBucketRateLimiter
+java -cp out LeakyBucketRateLimiter
+```

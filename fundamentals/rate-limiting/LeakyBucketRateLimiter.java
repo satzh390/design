@@ -1,5 +1,3 @@
-package rateLimiter;
-
 import java.time.Duration;
 import java.time.Instant;
 
@@ -39,6 +37,13 @@ public class LeakyBucketRateLimiter {
     public synchronized double getWaterLevel() {
         leak();
         return water;
+    }
+
+    public static void main(String[] args) {
+        LeakyBucketRateLimiter limiter = new LeakyBucketRateLimiter(2, 1);
+        System.out.println("Request 1 allowed: " + limiter.allowRequest());
+        System.out.println("Request 2 allowed: " + limiter.allowRequest());
+        System.out.println("Request 3 allowed: " + limiter.allowRequest());
     }
 }
 

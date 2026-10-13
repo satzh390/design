@@ -1,5 +1,3 @@
-package rateLimiter;
-
 public class FixedWindowRateLimiter {
     private final int maxRequests;
     private final long windowSizeInMillis;
