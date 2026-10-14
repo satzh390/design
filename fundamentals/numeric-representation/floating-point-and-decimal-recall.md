@@ -166,9 +166,7 @@ The same unscaled integer with different scales represents different values:
 | 12345 | 0 | 12345 |
 | 12345 | 1 | 1234.5 |
 | 12345 | 2 | 123.45 |
-| 12345 | 3 | 123.45? |
-
-Correction for scale 3: `12345 × 10⁻³ = 12.345`.
+| 12345 | 3 | 12.345 |
 
 `BigDecimal` can preserve trailing-zero scale: `new BigDecimal("123.4500")` has scale 4, while `new BigDecimal("123.45")` has scale 2. They compare numerically equal using `compareTo`, though `equals` also considers scale.
 
