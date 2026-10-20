@@ -5,7 +5,6 @@ This directory contains implementation code for selected system-design exercises
 | Project | Design workspace | Implementation |
 |---|---|---|
 | Distributed rate limiter | [Exercise](../../system-design/exercises/distributed-rate-limiter/), [question](../../system-design/exercises/questions/01-distributed-rate-limiter.md) | [Java/Spring prototype](./distributed-rate-limiter/ratelimiter/README.md); code and tests exist, in progress |
-| Webhook delivery | [Exercise](../../system-design/exercises/webhook-delivery/), [question](../../system-design/exercises/questions/03-webhook-delivery.md) | [Webhook notifier](./webhook-notifier/README.md); scaffolding only, delivery behavior pending |
 | URL shortener | [Exercise](../../system-design/exercises/url-shortener/), [question](../../system-design/exercises/questions/11-url-shortener.md) | [Java ID examples](./url-shortener/README.md); partial implementation |
 | Payment gateway | [Question](../../system-design/exercises/questions/13-payment-gateway.md) | Not started |
 | Restaurant booking | [Question](../../system-design/exercises/questions/14-restaurant-booking.md) | Not started |

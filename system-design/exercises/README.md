@@ -12,7 +12,7 @@ This folder separates question prompts from design materials:
 |---|---|---|
 | [01 Distributed rate limiter](./questions/01-distributed-rate-limiter.md) | [distributed-rate-limiter/](./distributed-rate-limiter/) | [Java prototype](../../projects/side-quests/distributed-rate-limiter/ratelimiter/README.md) |
 | [02 Idempotency service](./questions/02-idempotency-service.md) | Not started | Not started |
-| [03 Webhook delivery](./questions/03-webhook-delivery.md) | [webhook-delivery/](./webhook-delivery/) | [Webhook notifier](../../projects/side-quests/webhook-notifier/README.md) |
+| [03 Webhook delivery](./questions/03-webhook-delivery.md) | [webhook-delivery/](./webhook-delivery/) | Not started |
 | [04 Delayed job queue](./questions/04-delayed-job-queue.md) | Not started | Not started |
 | [05 Distributed cache](./questions/05-distributed-cache.md) | Not started | Not started |
 | [06 Distributed lock](./questions/06-distributed-lock.md) | Not started | Not started |
