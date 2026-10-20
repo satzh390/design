@@ -22,6 +22,7 @@ A learning portfolio for distributed-systems fundamentals, low-level design, sys
 | [Rate limiting](./fundamentals/rate-limiting/) | Fixed-window, leaky-bucket, sliding-window, and token-bucket examples |
 | [Replica consistency](./fundamentals/replica-consistency/) | Vector clock and Merkle tree examples, with other approaches documented |
 | [Storage](./fundamentals/storage/) | Bloom filter and quadtree examples |
+| [Numeric representation](./fundamentals/numeric-representation/README.md) | In-depth guide to binary fractions, IEEE 754 `double`, rounding, `BigDecimal`, and integer encodings |
 
 ## Low-level design
 
